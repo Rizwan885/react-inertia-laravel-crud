@@ -16,21 +16,19 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-
-        $products = Product::query();
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $products->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%$search%")
-                    ->orWhere('description', 'like', "%$search%")
-                    ->orWhere('price', 'like', "%$search%");
-            });
-        }
-
-        $products = $products->latest()->paginate(5)->withQueryString();
-        $products->getCollection()->transform(fn($product) => [
+        // $products = Product::latest()->get()->map(fn($product) => [
+        //     'id' => $product->id,
+        //     'name' => $product->name,
+        //     'description' => $product->description,
+        //     'price' => $product->price,
+        //     'featured_image' => $product->featured_image,
+        //     'featured_image_original_name' => $product->featured_image_original_name,
+        //     'created_at' => $product->created_at->format('d M Y'),
+        // ]);
+        $products=Product::latest()->paginate(1);
+         $products->getCollection()->transform(fn($product) => [
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
@@ -39,7 +37,7 @@ class ProductController extends Controller
             'featured_image_original_name' => $product->featured_image_original_name,
             'created_at' => $product->created_at->format('d M Y'),
         ]);
-        return Inertia::render('products/index', ['products' => $products, 'filters' => $request->only(['search'])]);
+        return Inertia::render('products/index', ['products' => $products]);
     }
 
     /**
